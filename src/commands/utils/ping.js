@@ -9,7 +9,7 @@ module.exports = class Fav extends Interaction {
   async exec(int) {
     return int.reply({
       content: `🏓 Pong!\n 📡 Ping: ${int.client.ws.ping}ms latency`,
-      ephemeral: true,
+      ephemeral: false,
     });
   }
 };
