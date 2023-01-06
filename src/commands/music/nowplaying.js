@@ -28,7 +28,7 @@ module.exports = class NowPlaying extends Interaction {
         ephemeral: true,
       });
 
-    let isAllowed = data.voiceChannels.find((c) => c === channel.id);
+    let isAllowed = true;
 
     if (data.voiceChannels.length > 0 && !isAllowed) {
       return int.reply({

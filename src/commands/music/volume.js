@@ -34,7 +34,7 @@ module.exports = class Volume extends Interaction {
       });
 
     let isDJ = data.djRoles.some((r) => int.member._roles.includes(r));
-    let isAllowed = data.voiceChannels.find((c) => c === channel.id);
+    let isAllowed = true;
     let members = channel.members.filter((m) => !m.user.bot);
 
     if (data.voiceChannels.length > 0 && !isAllowed) {
