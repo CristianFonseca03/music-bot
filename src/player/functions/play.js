@@ -1,89 +1,86 @@
 module.exports = async function play(
-    client,
-    int,
-    data,
-    input,
-    source = "youtube",
-    playlist = false,
-    search = false,
-    last = false,
-    force = false
+  client,
+  int,
+  data,
+  input,
+  source = 'youtube',
+  playlist = false,
+  search = false,
+  last = false,
+  force = false,
 ) {
+  let guildQueue = client.player.hasQueue(int.guild.id);
+  let queue;
 
-    let guildQueue = client.player.hasQueue(int.guild.id);
-    let queue;
+  if (!guildQueue) {
+    queue = client.player.createQueue(int.guild.id);
+    queue.skipVotes = [];
+  } else {
+    queue = client.player.getQueue(int.guild.id);
+  }
 
-    if (!guildQueue) {
-        queue = client.player.createQueue(int.guild.id);
-        queue.skipVotes = [];
+  let channel = int.member.voice.channel;
+
+  await queue.join(channel).catch((err) => {
+    client.logger.error(
+      `Couldn't join the voice channel\n${err.stack ? err + '\n\n' + err.stack : err}`,
+      { tag: 'Player' },
+    );
+
+    if (search) {
+      return int.editReply({
+        content: `${client.emotes.get('nomic')} I couldn't join the voice channel.`,
+        embeds: [],
+      });
     } else {
-        queue = client.player.getQueue(int.guild.id);
+      return int.reply({
+        content: `${client.emotes.get('nomic')} I couldn't join the voice channel!`,
+        ephemeral: true,
+      });
     }
+  });
 
-    let channel = int.member.voice.channel;
+  if (!search && !last) {
+    int.reply(
+      `${client.emotes.get('search')} Searching \`${input}\` ${client.emotes.get(`${source}`)}`,
+    );
+  }
 
-    await queue.join(channel).catch((err) => {
-        client.logger.error(`Couldn't join the voice channel\n${err.stack ? err + "\n\n" + err.stack : err}`, {tag: "Player"})
+  queue.textChannel = int.channel;
 
-        if (search) {
-            return int.editReply({
-                content: `${client.emotes.get("nomic")} I couldn't join the voice channel.`,
-                embeds: [],
-            });
-        } else {
-            return int.reply({
-                content: `${client.emotes.get("nomic")} I couldn't join the voice channel!`,
-                ephemeral: true,
-            });
-        }
+  if (playlist) {
+    let pl = await queue.playlist(input, { requestedBy: int.user }).catch((_, err) => {
+      if (err) {
+        console.log(err);
+      }
+      if (!queue) {
+        queue.stop();
+      }
     });
 
-    if (!search && !last) {
-        int.reply(
-            `${client.emotes.get("search")} Searching \`${input}\` ${client.emotes.get(`${source}`)}`
-        );
-    }
-
-    queue.textChannel = int.channel;
-
-    if (playlist) {
-        let pl = await queue
-            .playlist(input, {requestedBy: int.user})
-            .catch((_, err) => {
-                if (err) {
-                    console.log(err);
-                }
-                if (!queue) {
-                    queue.stop();
-                }
-            });
-
-        if (!pl) return int.channel.send(`${client.emotes.get("notfound")} No playlist found!`);
-    } else {
-        if (force) {
-            let song = await queue
-                .play(input, {index: 0, requestedBy: int.user})
-                .catch((_, err) => {
-                    if (err) {
-                        console.log(err);
-                    }
-                    if (!queue) {
-                        queue.stop();
-                    }
-                });
-            if (!song) return int.channel.send(`${client.emotes.get("notfound")} No track found!`);
-            queue.skip()
-        } else {
-            let song = await queue.play(input, {requestedBy: int.user}).catch((_, err) => {
-                if (err) {
-                    console.log(err);
-                }
-                if (!queue) {
-                    queue.stop();
-                }
-            });
-            if (!song) return int.channel.send(`${client.emotes.get("notfound")} No track found!`);
+    if (!pl) return int.channel.send(`${client.emotes.get('notfound')} No playlist found!`);
+  } else {
+    if (force) {
+      let song = await queue.play(input, { index: 0, requestedBy: int.user }).catch((_, err) => {
+        if (err) {
+          console.log(err);
         }
-
+        if (!queue) {
+          queue.stop();
+        }
+      });
+      if (!song) return int.channel.send(`${client.emotes.get('notfound')} No track found!`);
+      queue.skip();
+    } else {
+      let song = await queue.play(input, { requestedBy: int.user }).catch((_, err) => {
+        if (err) {
+          console.log(err);
+        }
+        if (!queue) {
+          queue.stop();
+        }
+      });
+      if (!song) return int.channel.send(`${client.emotes.get('notfound')} No track found!`);
     }
+  }
 };

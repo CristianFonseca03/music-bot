@@ -7,7 +7,9 @@
     "node": "16.x"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint:fix": "eslint --fix ./src",
+    "prettier": "prettier --write ."
   },
   "repository": {
     "type": "git",
@@ -45,5 +47,11 @@
     "seconds-formater": "^1.2.0",
     "utf-8-validate": "^5.0.9",
     "util": "^0.12.4"
+  },
+  "devDependencies": {
+    "eslint": "^8.31.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.8.1"
   }
 }
