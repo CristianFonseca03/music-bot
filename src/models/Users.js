@@ -1,12 +1,12 @@
-const { Schema, model } = require('mongoose');
+import {Schema, model} from "mongoose";
 
-module.exports = model(
-  'Users',
-  new Schema(
-    {
-      _id: String,
-      savedSongs: Array,
-    },
-    { versionKey: false },
-  ),
+export default model(
+    "Users",
+    new Schema(
+        {
+            _id: String,
+            savedSongs: Array,
+        },
+        {versionKey: false}
+    )
 );
